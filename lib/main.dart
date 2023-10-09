@@ -39,19 +39,32 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('Provider 08'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          // Column위젯의 사이즈의 Children들의 사이즈만큼만 차지하도록 MainAxisSize.min으로 설정하였습니다.
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '- name: ${context.watch<Dog>().name}',
-              style: TextStyle(fontSize: 20.0),
+      body: Consumer(
+        builder: (BuildContext context, Dog dog, Widget? child) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              // Column위젯의 사이즈의 Children들의 사이즈만큼만 차지하도록 MainAxisSize.min으로 설정하였습니다.
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Text('I like dogs very much', ...)을 rebuild하고 싶지 않다면?
+                // Widget? child를 사용합니다.
+                child!,
+                SizedBox(height: 20.0),
+                Text(
+                  // '- name: ${context.watch<Dog>().name}',
+                  '- name: ${dog.name}',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+                SizedBox(height: 10.0),
+                BreedAndAge(),
+              ],
             ),
-            SizedBox(height: 10.0),
-            BreedAndAge(),
-          ],
+          );
+        },
+        child: Text(
+          'I like dogs very much',
+          style: TextStyle(fontSize: 20.0),
         ),
       ),
     );
@@ -59,53 +72,55 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class BreedAndAge extends StatelessWidget {
-
   const BreedAndAge({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          '- breed: ${context.select<Dog, String>((Dog dog) => dog.breed)}',
-          style: TextStyle(fontSize: 20.0),
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        Age(),
-      ],
-    );
+    return Consumer(builder: (_, Dog dog, __) {
+      return Column(
+        children: [
+          Text(
+            '- breed: ${dog.breed}',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          SizedBox(
+            height: 10.0,
+          ),
+          Age(),
+        ],
+      );
+    });
   }
 }
 
 class Age extends StatelessWidget {
-
   const Age({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          '- age: ${context.select<Dog, int>((Dog dog) => dog.age)}',
-          style: TextStyle(fontSize: 20.0),
-        ),
-        SizedBox(height: 20.0),
-        ElevatedButton(
-          onPressed: () => context.read<Dog>().grow(),
-          child: Text(
-            'Grow',
-            style: TextStyle(
-              fontSize: 20.0,
+    return Consumer(builder: (_, Dog dog, __) {
+      return Column(
+        children: [
+          Text(
+            '- age: ${dog.age}',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () => dog.grow(),
+            child: Text(
+              'Grow',
+              style: TextStyle(
+                fontSize: 20.0,
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
